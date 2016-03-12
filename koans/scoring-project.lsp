@@ -49,9 +49,31 @@
 ;
 ; Your goal is to write the score method.
 
+
 (defun score (dice)
-  ; You need to write this method
-)
+  (unless dice (return-from score 0))
+  (loop for x in dice
+     when (= 1 x) count x into one-count
+     when (= 2 x) count x into two-count
+     when (= 3 x) count x into three-count
+     when (= 4 x) count x into four-count
+     when (= 5 x) count x into five-count
+     when (= 6 x) count x into six-count
+     finally (return (+ (score-ones   one-count)
+                        (score-others two-count 2)
+                        (score-others three-count 3)
+                        (score-others four-count 4)
+                        (score-fives  five-count)
+                        (score-others six-count 6)))))
+
+(defun score-fives (number-of-fives)
+  (multiple-value-bind (n d) (truncate number-of-fives 3) (+ (* n 500) (* d 50))))
+
+(defun score-ones (number-of-ones)
+  (multiple-value-bind (n d) (truncate number-of-ones 3) (+ (* n 1000) (* d 100))))
+
+(defun score-others (count n)
+  (* (truncate count 3) (* n 100)))
 
 (define-test test-score-of-an-empty-list-is-zero
     (assert-equal 0 (score nil)))
